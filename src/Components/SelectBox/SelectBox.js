@@ -4,7 +4,6 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
 const SelectBox = (props) => {
-  console.log(props.activeCountry);
   return (
     <div
       className={`${classes.header}  d-flex justify-content-center align-items-center`}
@@ -12,7 +11,6 @@ const SelectBox = (props) => {
       <Autocomplete
         value={props.activeCountry}
         onChange={(event, newValue) => {
-          console.log(newValue);
           props.setActiveCountry(newValue);
         }}
         options={props.data}

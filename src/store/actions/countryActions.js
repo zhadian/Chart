@@ -3,26 +3,8 @@ import axios from "axios";
 
 export const setCountries = (data) => {
   return {
-    type: actionType.SET_USERS,
+    type: actionType.SET_COUNTRIES,
     data: data,
-  };
-};
-export const updateUsers = (searchTerm) => {
-  return {
-    type: actionType.UPDATE_USERS,
-    searchTerm: searchTerm,
-  };
-};
-export const deleteUser = (user) => {
-  return {
-    type: actionType.DELETE_USER,
-    user: user,
-  };
-};
-export const deleteSelectedUsers = (selectedUsers) => {
-  return {
-    type: actionType.DELETE_SELECTED_USER,
-    selectedUsers: selectedUsers,
   };
 };
 

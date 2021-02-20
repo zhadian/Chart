@@ -6,6 +6,7 @@ import SelectBox from "../Components/SelectBox/SelectBox";
 import Tabs from "../Components/TabsCard/TabsCard";
 import RankedCharts from "../Components/RankedCharts/RankedCharts";
 import ReportedCases from "../Components/ReportedCases/ReportedCases";
+import MoonLoader from "react-spinners/MoonLoader";
 
 const MainPage = () => {
   const arrayOfData = useSelector((state) => state.coutnries.arrayOfData);
@@ -21,8 +22,14 @@ const MainPage = () => {
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
   };
-  console.log(activeCountry);
 
+  if (!arrayOfData) {
+    return (
+      <div className="w-100 vh-100 d-flex justify-content-center align-items-center">
+        <MoonLoader color="rgb(66, 165, 245)" size={150} />
+      </div>
+    );
+  }
   return (
     <div className={classes.container}>
       <SelectBox
@@ -37,12 +44,11 @@ const MainPage = () => {
             data={
               activeCountry
                 ? activeCountry
-                : arrayOfData.find((item) => item.location === "International")
+                : arrayOfData.find((item) => item.location === "World")
             }
           />
         ) : (
-          // "popo"
-          <RankedCharts data={[...arrayOfData]} />
+          <RankedCharts data={arrayOfData} activeCountry={activeCountry} />
         )}
       </div>
     </div>
