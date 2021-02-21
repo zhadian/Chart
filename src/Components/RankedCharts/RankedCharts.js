@@ -1,22 +1,15 @@
 import React from "react";
-import Paper from "@material-ui/core/Paper";
-import customStyle from "./RankedCharts.module.css";
-import {
-  Chart,
-  BarSeries,
-  Title,
-  ArgumentAxis,
-  ValueAxis,
-} from "@devexpress/dx-react-chart-material-ui";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
-
-import { Animation } from "@devexpress/dx-react-chart";
+import ReactECharts from "echarts-for-react";
 import _ from "underscore";
+import {
+  makeStyles,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormControlLabel,
+  TextField,
+} from "@material-ui/core/";
+import customStyle from "./RankedCharts.module.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -31,6 +24,7 @@ const RankedCharts = (props) => {
   const [value, setValue] = React.useState("totalCases");
   const [userNumInput, setUserNumInpute] = React.useState(10);
   const classes = useStyles();
+
   const data =
     props.data &&
     props.data
@@ -42,13 +36,10 @@ const RankedCharts = (props) => {
           totalDeaths: item.data[dataLength].total_deaths,
           totalCases: item.data[dataLength].total_cases,
         };
-        if (item.location === props.activeCountry?.location) {
-          obj.color = "red";
-        }
         return obj;
       });
 
-  const barData = _.sortBy(data, function (row) {
+  const sortedData = _.sortBy(data, function (row) {
     if (row.totalDeaths && value === "totalDeaths") {
       return row.totalDeaths * -1;
     }
@@ -57,6 +48,63 @@ const RankedCharts = (props) => {
     }
   }).splice(0, userNumInput);
 
+  const axisData = {
+    xAxis: [],
+    yAxis: {
+      deaths: [],
+      cases: [],
+    },
+  };
+
+  sortedData.map((item) => {
+    if (item.location === props.activeCountry?.location) {
+      const colorData = (type) => {
+        return {
+          value: type,
+          itemStyle: {
+            color: "#a90000",
+          },
+        };
+      };
+      axisData.xAxis.push(item.location);
+      axisData.yAxis.cases.push(colorData(item.totalCases));
+      axisData.yAxis.deaths.push(colorData(item.totalDeaths));
+    } else {
+      axisData.xAxis.push(item.location);
+      axisData.yAxis.deaths.push(item.totalDeaths);
+      axisData.yAxis.cases.push(item.totalCases);
+    }
+  });
+
+  const options = {
+    grid: { top: 40, right: 70, bottom: 4, left: 20, containLabel: true },
+    xAxis: {
+      name: "Country",
+      type: "category",
+      data: axisData.xAxis,
+      axisLabel: {
+        rotate: 45,
+      },
+    },
+    yAxis: {
+      name: value === "totalCases" ? "Total Cases" : "Total Deaths",
+      type: "value",
+      axisLabel: {
+        rotate: 0,
+      },
+    },
+    series: [
+      {
+        data:
+          value === "totalCases" ? axisData.yAxis.cases : axisData.yAxis.deaths,
+        type: "bar",
+        smooth: true,
+      },
+    ],
+    tooltip: {
+      trigger: "axis",
+    },
+  };
   const handleChange = (event) => {
     setValue(event.target.value);
   };
@@ -65,28 +113,13 @@ const RankedCharts = (props) => {
       setUserNumInpute(event.target.value);
     }
   };
-
   return (
     <>
-      <div className={`w-100 overflow-auto ${customStyle.container}`}>
-        <div style={{ width: userNumInput * 73 }}>
-          <Paper>
-            <Chart data={barData}>
-              <ArgumentAxis />
-              <ValueAxis max={7} />
-              <BarSeries
-                barWidth={0.5}
-                valueField={
-                  value === "totalDeaths" ? "totalDeaths" : "totalCases"
-                }
-                argumentField="location"
-              />
-              <Title text="Ranked Chart" />
-              <Animation />
-            </Chart>
-          </Paper>
-        </div>
-      </div>
+      <ReactECharts
+        style={{ height: 480 }}
+        theme={props.darkMode ? "dark" : "light"}
+        option={options}
+      />
       <div className="d-flex justify-content-between m-3">
         <FormControl component="fieldset">
           <RadioGroup
@@ -122,6 +155,7 @@ const RankedCharts = (props) => {
             id="standard-number"
             label="Number Of Countries"
             type="number"
+            size="small"
             InputLabelProps={{
               shrink: true,
             }}

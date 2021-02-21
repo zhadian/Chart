@@ -3,7 +3,7 @@ import MainPage from "./MainPage/MainPage";
 
 function App() {
   return (
-    <div className="vh-100 bg-light">
+    <div className="vh-100">
       <MainPage />
     </div>
   );

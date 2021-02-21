@@ -4,14 +4,27 @@ import { useSelector, useDispatch } from "react-redux";
 import { getCountries } from "../store/actions/countryActions";
 import SelectBox from "../Components/SelectBox/SelectBox";
 import Tabs from "../Components/TabsCard/TabsCard";
-import RankedCharts from "../Components/RankedCharts/RankedCharts";
 import ReportedCases from "../Components/ReportedCases/ReportedCases";
 import MoonLoader from "react-spinners/MoonLoader";
+import RankedCharts from "../Components/RankedCharts/RankedCharts";
+import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { Paper, Card, Switch, FormControlLabel } from "@material-ui/core/";
 
 const MainPage = () => {
   const arrayOfData = useSelector((state) => state.coutnries.arrayOfData);
   const [activeCountry, setActiveCountry] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+
   const [tabValue, setTabValue] = useState(0);
+
+  const theme = createMuiTheme({
+    palette: {
+      mode: darkMode ? "dark" : "light",
+      primary: {
+        main: "#36a2da",
+      },
+    },
+  });
 
   const dispatch = useDispatch();
 
@@ -30,28 +43,57 @@ const MainPage = () => {
       </div>
     );
   }
+  console.log(theme);
+
+  const onChangeDarkModeHandler = () => {
+    setDarkMode(!darkMode);
+  };
   return (
-    <div className={classes.container}>
-      <SelectBox
-        activeCountry={activeCountry}
-        setActiveCountry={setActiveCountry}
-        data={arrayOfData}
-      />
-      <Tabs tabValue={tabValue} handleChange={handleChange} />
-      <div className={`${classes.tabCard} w-100`}>
-        {tabValue === 0 ? (
-          <ReportedCases
-            data={
-              activeCountry
-                ? activeCountry
-                : arrayOfData.find((item) => item.location === "World")
-            }
+    <ThemeProvider theme={theme}>
+      <Paper style={{ height: "100vh", borderRadius: 0 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={darkMode}
+              onChange={onChangeDarkModeHandler}
+              name="checkedB"
+              color="primary"
+            />
+          }
+          label="Dark Mode"
+        />
+        <div className={classes.container}>
+          <SelectBox
+            activeCountry={activeCountry}
+            setActiveCountry={setActiveCountry}
+            data={arrayOfData}
           />
-        ) : (
-          <RankedCharts data={arrayOfData} activeCountry={activeCountry} />
-        )}
-      </div>
-    </div>
+          <Tabs
+            tabValue={tabValue}
+            handleChange={handleChange}
+            indicatorColor="primary.lig"
+          />
+          <Card className={`${classes.tabCard} w-100`}>
+            {tabValue === 0 ? (
+              <ReportedCases
+                darkMode={darkMode}
+                data={
+                  activeCountry
+                    ? activeCountry
+                    : arrayOfData.find((item) => item.location === "World")
+                }
+              />
+            ) : (
+              <RankedCharts
+                darkMode={darkMode}
+                data={arrayOfData}
+                activeCountry={activeCountry}
+              />
+            )}
+          </Card>
+        </div>
+      </Paper>
+    </ThemeProvider>
   );
 };
 
