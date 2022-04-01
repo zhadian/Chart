@@ -19,4 +19,4 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ### - I have used Heroku cloud server to deploy the project and you can check it at this URL:
 
-### https://outvio.herokuapp.com/
+### https://corona-virus-statistics-chart.herokuapp.com/
